@@ -42,10 +42,10 @@ router.get("/family", async (req, res) => {
     const familyMembers = await Family.find().sort({ createdAt: -1 });
 
     if (!familyMembers || familyMembers.length === 0) {
-      return res.status(404).json({
-        success: false,
+      return res.status(200).json({  // ✅ Changed to 200 instead of 404
+        success: true,
         message: "No family members found",
-        data: []
+        family: []  // ✅ Changed from 'data' to 'family'
       });
     }
 
@@ -53,13 +53,14 @@ router.get("/family", async (req, res) => {
       success: true,
       message: "Family members retrieved successfully",
       count: familyMembers.length,
-      data: familyMembers
+      family: familyMembers  // ✅ Changed from 'data' to 'family'
     });
   } catch (error) {
     console.error("Error fetching family members:", error);
     res.status(500).json({
       success: false,
       message: "Error fetching family members",
+      family: [],  // ✅ Add empty array for consistency
       error: error.message
     });
   }
