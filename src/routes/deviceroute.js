@@ -20,12 +20,6 @@ router.post("/addFamily", async (req, res) => {
     const familyMember = new Family({ name, email });
     await familyMember.save();
 
-    // Send Email
-    await sendEmail(
-      email,
-      "Welcome to Family Tracker",
-      `Hello ${name},\n\nYou’ve been added to the Family Tracker system!\n\n— Team Tracker`
-    );
 
     res.status(200).json({
       success: true,
