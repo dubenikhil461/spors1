@@ -42,6 +42,35 @@ router.post("/addFamily", async (req, res) => {
   }
 });
 
+
+router.get("/family", async (req, res) => {
+  try {
+    const familyMembers = await Family.find().sort({ createdAt: -1 });
+
+    if (!familyMembers || familyMembers.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No family members found",
+        data: []
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Family members retrieved successfully",
+      count: familyMembers.length,
+      data: familyMembers
+    });
+  } catch (error) {
+    console.error("Error fetching family members:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching family members",
+      error: error.message
+    });
+  }
+});
+
 // Report lost device
 router.post("/reportlost/:deviceId", async (req, res) => {
   const { deviceId } = req.params;
