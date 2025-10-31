@@ -6,9 +6,9 @@ import express from "express";
 
 const app = express.Router();
 
-app.use("/api/auth", authRoutes);
-app.use("/api/device", deviceRoutes);
-app.use("/api/location", locationRoutes);
+app.use("/auth", authRoutes);
+app.use("/device", deviceRoutes);
+app.use("/location", locationRoutes);
 
 
 export default app
