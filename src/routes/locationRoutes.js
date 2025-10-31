@@ -1,5 +1,5 @@
 import express from "express";
-import Track from "../models/Track.js";
+import Track from "../models/track.js";
 
 const router = express.Router();
 
