@@ -15,5 +15,9 @@ connectDB();
 // Routes
 app.use("/api", approutes);
 
+app.get("/",(req,res)=>{
+    res.send("api is running")
+})
+
 // Server
 app.listen(9000, () => console.log("🚀 Server running on port 9000"));
