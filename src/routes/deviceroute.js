@@ -93,4 +93,32 @@ router.get("/device/:id", async (req, res) => {
   });
 });
 
+
+// Delete family member
+router.delete("/family/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedMember = await Family.findByIdAndDelete(id);
+
+    if (!deletedMember) {
+      return res.status(404).json({
+        success: false,
+        message: "Family member not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Family member deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting family member:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting family member",
+      error: error.message
+    });
+  }
+});
 export default router;
