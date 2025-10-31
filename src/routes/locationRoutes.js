@@ -8,7 +8,7 @@ router.post("/setlocation", async (req, res) => {
   const { deviceId, latitude, longitude } = req.body;
   if (!deviceId || !latitude || !longitude)
     return res.status(400).json({ error: "Missing fields" });
-
+     console.log(" device Info ",deviceId,latitude,longitude)
   try {
     await Track.create({ deviceid: deviceId, latitude, longitude });
     res.json({ success: true, message: "Location saved" });
