@@ -10,7 +10,7 @@ const app = express();
 app.use(
   cors({
       origin: [
-      "https://spors.vercel.app/", 
+      "https://spors.vercel.app", 
       "http://localhost:5173",
       "http://localhost:3000" // Add any other ports you might use
     ],
