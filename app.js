@@ -9,7 +9,7 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin: ["https://spors-1.onrender.com", "http://localhost:8080"], // allowed frontend
+    origin: ["*","https://magical-platypus-b14617.netlify.app/", "http://localhost:8080"], // allowed frontend
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
