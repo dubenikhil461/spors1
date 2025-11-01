@@ -7,7 +7,7 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-    origin : ["*"]
+    origin : ["*","http://localhost:8080","https://sporss.netlify.app"]
 }));
 app.use(express.json());
 
