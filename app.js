@@ -9,8 +9,13 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin: ["*","https://magical-platypus-b14617.netlify.app", "http://localhost:5173"], // allowed frontend
+      origin: [
+      "https://magical-platypus-b14617.netlify.app", 
+      "http://localhost:5173",
+      "http://localhost:3000" // Add any other ports you might use
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(express.json());
