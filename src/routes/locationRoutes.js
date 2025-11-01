@@ -17,6 +17,16 @@ router.post("/setlocation", async (req, res) => {
   }
 });
 
+// Get all location
+router.get("/getlocation", async (req, res) => {
+  const locations = await Track.find().sort({ timestamp: -1 });
+
+  if (locations.length === 0)
+    return res.status(404).json({ success: false, message: "Not found " });
+
+  res.json({ success: true, data: locations });
+});
+
 // Get latest location
 router.get("/getlocation/:deviceId", async (req, res) => {
   const { deviceId } = req.params;
@@ -28,13 +38,5 @@ router.get("/getlocation/:deviceId", async (req, res) => {
   res.json({ success: true, data: locations });
 });
 
-router.get("/getlocation", async (req, res) => {
-  const locations = await Track.find().sort({ timestamp: -1 });
-
-  if (locations.length === 0)
-    return res.status(404).json({ success: false, message: "Not found " });
-
-  res.json({ success: true, data: locations });
-});
 
 export default router;
