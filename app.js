@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./src/config/db.js";
 import approutes from "./src/route.js";
-import { getPredictionByDevice } from "./src/routes/riskroute.js";
+import { getPredictionByDevice } from "./src/routes/getPredictionByDevice.js";
 
 const app = express();
 

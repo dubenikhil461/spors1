@@ -1,47 +1,25 @@
-import axios from "axios";
-import Trace from "../models/track.js";
+import express from "express";
 import Risk from "../models/riskmodel.js";
 
-export async function getPredictionByDevice(model = "idw", k = 10) {
+const router = express.Router();
+
+router.get("/calculate", async (req, res) => {
   try {
-    // 1️⃣ Get latest trace data (latest location for a device)
-    const latestTrace = await Trace.findOne().sort({ timestamp: -1 }).lean();
+    const allRisks = await Risk.find().sort({ timestamp: -1 }).limit(50);
 
-    if (!latestTrace) {
-      console.warn("⚠️ No trace data found.");
-      return;
-    }
-
-    const { latitude, longitude, deviceid } = latestTrace;
-
-    if (latitude == null || longitude == null || !deviceid) {
-      console.warn(`⚠️ Missing coordinates or device ID.`);
-      return;
-    }
-
-    // 2️⃣ Call Python API for prediction
-    const url = "https://ai-model-ue6w.onrender.com/predict";
-    const params = { lat: latitude, lon: longitude, k, model };
-
-    const response = await axios.get(url, { params });
-    const { risk } = response.data;
-
-    // 3️⃣ Upsert (insert or update existing record)
-    const filter = { deviceid, latitude, longitude, model, k };
-    const update = {
-      $set: {
-        risk,
-        timestamp: new Date(),
-      },
-    };
-
-    const options = { upsert: true, new: true }; // ✅ avoid duplicates
-
-    const savedRecord = await Risk.findOneAndUpdate(filter, update, options);
-
-    console.log(`✅ Risk data updated for device ${deviceid} → risk: ${risk}`);
-    return savedRecord;
+    return res.status(200).json({
+      success: true,
+      message: "✅ Risk calculation complete.",
+      total: allRisks.length,
+      data: allRisks,
+    });
   } catch (error) {
-    console.error(`❌ Prediction failed: ${error.message}`);
+    console.error("❌ Error during risk calculation:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
   }
-}
+});
+
+export default router;
