@@ -8,7 +8,7 @@ const app = express();
 // Middlewares
 app.use(
   cors({
-    origin: ["https://sporss.netlify.app"], // allowed frontend
+    origin: ["https://sporss.netlify.app","http://localhost:8080"], // allowed frontend
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
