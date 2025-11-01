@@ -6,9 +6,12 @@ import approutes from "./src/route.js";
 const app = express();
 
 // Middlewares
-app.use(cors({
-    origin : ["*","http://localhost:8080","https://sporss.netlify.app"]
-}));
+app.use(
+  cors({
+    origin: ["https://sporss.netlify.app"], // allowed frontend
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 app.use(express.json());
 
 // Connect to MongoDB
@@ -17,9 +20,9 @@ connectDB();
 // Routes
 app.use("/api", approutes);
 
-app.get("/",(req,res)=>{
-    res.send("api is running")
-})
+app.get("/", (req, res) => {
+  res.send("api is running");
+});
 
 // Server
 app.listen(9000, () => console.log("🚀 Server running on port 9000"));
