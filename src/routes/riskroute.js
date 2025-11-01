@@ -4,64 +4,43 @@ import Risk from "../models/riskmodel.js";
 
 export async function getPredictionByDevice(model = "idw", k = 10) {
   try {
-    // 1️⃣ Get all unique devices
-    const devices = await Trace.distinct("deviceid");
-    if (!devices.length) {
-      console.warn("⚠️ No devices found in trace collection.");
+    // 1️⃣ Get latest trace data (latest location for a device)
+    const latestTrace = await Trace.findOne().sort({ timestamp: -1 }).lean();
+
+    if (!latestTrace) {
+      console.warn("⚠️ No trace data found.");
       return;
     }
 
-    console.log(`📡 Found ${devices.length} devices.`);
+    const { latitude, longitude, deviceid } = latestTrace;
 
-    for (const deviceid of devices) {
-      // 2️⃣ Get latest trace for each device
-      const latestTrace = await Trace.findOne({ deviceid })
-        .sort({ timestamp: -1 })
-        .lean();
-
-      if (!latestTrace) continue;
-
-      const { latitude, longitude } = latestTrace;
-      if (latitude == null || longitude == null) continue;
-
-      // 3️⃣ Check if this combination already exists in Risk collection
-      const exists = await Risk.findOne({
-        deviceid,
-        latitude,
-        longitude,
-        model,
-        k,
-      });
-
-      if (exists) {
-        console.log(`⏭️ Already exists for device ${deviceid} — skipping.`);
-        continue;
-      }
-
-      // 4️⃣ Get prediction from Python API
-      const url = "https://ai-model-ue6w.onrender.com/predict";
-      const params = { lat: latitude, lon: longitude, k, model };
-
-      const response = await axios.get(url, { params });
-      const { risk } = response.data;
-
-      // 5️⃣ Insert new record
-      const riskRecord = new Risk({
-        deviceid,
-        latitude,
-        longitude,
-        risk,
-        model,
-        k,
-        timestamp: new Date(),
-      });
-
-      await riskRecord.save();
-
-      console.log(`✅ Inserted new risk for device ${deviceid} → ${risk}`);
+    if (latitude == null || longitude == null || !deviceid) {
+      console.warn(`⚠️ Missing coordinates or device ID.`);
+      return;
     }
 
-    console.log("🎯 All new device risk records inserted.");
+    // 2️⃣ Call Python API for prediction
+    const url = "https://ai-model-ue6w.onrender.com/predict";
+    const params = { lat: latitude, lon: longitude, k, model };
+
+    const response = await axios.get(url, { params });
+    const { risk } = response.data;
+
+    // 3️⃣ Upsert (insert or update existing record)
+    const filter = { deviceid, latitude, longitude, model, k };
+    const update = {
+      $set: {
+        risk,
+        timestamp: new Date(),
+      },
+    };
+
+    const options = { upsert: true, new: true }; // ✅ avoid duplicates
+
+    const savedRecord = await Risk.findOneAndUpdate(filter, update, options);
+
+    console.log(`✅ Risk data updated for device ${deviceid} → risk: ${risk}`);
+    return savedRecord;
   } catch (error) {
     console.error(`❌ Prediction failed: ${error.message}`);
   }
